@@ -1,0 +1,36 @@
+
+services:
+  control:
+    build:
+      context: .
+      dockerfile: Dockerfile.control
+    container_name: ansible-control
+    working_dir: /lab
+    volumes:
+      - ./ansible:/lab/ansible
+      - ./inventory:/lab/inventory
+      - ./keys:/lab/keys
+    networks:
+      - ansible-net
+    stdin_open: true
+    tty: true
+
+  node1:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: ansible-node1
+    networks:
+      - ansible-net
+
+  node2:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: ansible-node2
+    networks:
+      - ansible-net
+
+networks:
+  ansible-net:
+    driver: bridge

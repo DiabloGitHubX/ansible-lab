@@ -1,0 +1,26 @@
+
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    python3 \
+    ca-certificates \
+    sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /run/sshd /root/.ssh \
+    && chmod 700 /root/.ssh
+
+# Allow SSH key authentication for the root user
+RUN sed -i 's/^#PermitRootLogin prohibit-password/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+
+# Install our lab's public key as an authorized SSH key
+COPY keys/id_ed25519.pub /root/.ssh/authorized_keys
+
+RUN chmod 600 /root/.ssh/authorized_keys
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd", "-D"]
